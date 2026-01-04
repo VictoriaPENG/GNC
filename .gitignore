@@ -1,0 +1,26 @@
+# ===== MATLAB =====
+*.asv
+*.m~
+*.autosave
+slprj/
+codegen/
+*.mex*
+*.p
+
+# ===== Simulink =====
+*.slxc
+
+# ===== OS / IDE =====
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ===== Results & Data =====
+results/
+data/raw/
+*.mat
+*.csv
+
+# ===== Logs =====
+*.log
