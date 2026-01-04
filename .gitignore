@@ -17,7 +17,7 @@ Thumbs.db
 .idea/
 
 # ===== Results & Data =====
-results/
+#results/
 data/raw/
 *.mat
 *.csv
