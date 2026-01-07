@@ -10,4 +10,13 @@ addpath(genpath(fullfile(root,'tools')));
 
 rehash;
 disp("GNC project initialized: core/ plots/ experiments/ added to path");
+set(groot,'defaultFigureColor','w');
+set(groot,'defaultAxesColor','w');
+set(groot,'defaultTextColor','k');
+set(groot,'defaultAxesXColor','k');
+set(groot,'defaultAxesYColor','k');
+set(groot,'defaultAxesZColor','k');
+set(groot,'defaultLegendTextColor','k');
+
 end
+

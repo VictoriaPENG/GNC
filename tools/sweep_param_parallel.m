@@ -1,75 +1,131 @@
-function res = sweep_param_parallel(route_modes, n_runs, base_seed, base_cfg, param_name, param_list, sim_func)
-%SWEEP_PARAM_PARALLEL Parallel sweep utility (PARFOR-safe, engineered).
+function res = sweep_param_parallel(route_modes, n_runs, base_seed, base, field, values, sim_func)
+%SWEEP_PARAM_PARALLEL (project-aligned)
+% Output matches run_topo_tree style, so plot_metric_vs_param_paper can be reused directly.
 %
-% res = sweep_param_parallel(route_modes, n_runs, base_seed, base_cfg, ...
-%                            param_name, param_list, sim_func)
+% res(m) contains:
+%   .route_mode
+%   .PDR, .PDR_std
+%   .avg_delay, .avg_delay_std
+%   .avg_hops,  .avg_hops_std
+%   .alive_ratio, .alive_ratio_std
+%   .energy_total, .energy_total_std
+%   .FND, .FND_std, .HND, .HND_std, .LND, .LND_std
 %
-% Output arrays are [n_mode x n_param x n_runs]
+% sim_func: function handle, out = sim_func(p). If omitted, defaults to main_energy_aware_tree(p).
 
 if nargin < 7 || isempty(sim_func)
-    error('sweep_param_parallel:MissingSimFunc', 'sim_func must be provided.');
+    sim_func = @main_energy_aware_tree;
 end
 
-n_mode  = numel(route_modes);
-n_param = numel(param_list);
-total   = n_mode * n_param * n_runs;
-
-% ---- Use flat arrays for PARFOR slicing safety ----
-PDR_flat   = nan(total,1);
-Delay_flat = nan(total,1);
-Hops_flat  = nan(total,1);
-FND_flat   = nan(total,1);
-HND_flat   = nan(total,1);
-LND_flat   = nan(total,1);
-
-parfor idx = 1:total
-    [m, pi, r] = ind2sub([n_mode, n_param, n_runs], idx);
-
-    p = base_cfg;
-    p.route_mode = route_modes{m};
-    p.(param_name) = param_list(pi);
-
-    % Deterministic seed per (mode, param, run)
-    p.seed = base_seed + 10000*m + 100*pi + r;
-    rng(p.seed, 'twister');
-
-    % Apply energy-aware config if tool exists (no hard dependency)
-    if exist('apply_energy_aware_cfg','file') == 2
-        p = apply_energy_aware_cfg(p);
-    end
-
-    out = sim_func(p);
-    f = out.final;
-
-    PDR_flat(idx)   = f.PDR;
-    Delay_flat(idx) = f.Delay;
-    Hops_flat(idx)  = f.Hops;
-    FND_flat(idx)   = f.FND;
-    HND_flat(idx)   = f.HND;
-    LND_flat(idx)   = f.LND;
-end
-
-% ---- Reshape back to 3D ----
-PDR   = reshape(PDR_flat,   [n_mode, n_param, n_runs]);
-Delay = reshape(Delay_flat, [n_mode, n_param, n_runs]);
-Hops  = reshape(Hops_flat,  [n_mode, n_param, n_runs]);
-FND   = reshape(FND_flat,   [n_mode, n_param, n_runs]);
-HND   = reshape(HND_flat,   [n_mode, n_param, n_runs]);
-LND   = reshape(LND_flat,   [n_mode, n_param, n_runs]);
-
+metrics = {'PDR','avg_delay','avg_hops','alive_ratio','energy_total','FND','HND','LND'};
 res = struct();
-res.PDR   = PDR;
-res.Delay = Delay;
-res.Hops  = Hops;
-res.FND   = FND;
-res.HND   = HND;
-res.LND   = LND;
 
-% Means
-res.PDR_m   = mean(PDR,   3, 'omitnan');
-res.Delay_m = mean(Delay, 3, 'omitnan');
-res.Hops_m  = mean(Hops,  3, 'omitnan');
-res.FND_m   = mean(FND,   3, 'omitnan');
-res.HND_m   = mean(HND,   3, 'omitnan');
-res.LND_m   = mean(LND,   3, 'omitnan');
+for m = 1:numel(route_modes)
+    res(m).route_mode = route_modes{m};
+    for k = 1:numel(metrics)
+        res(m).(metrics{k}) = zeros(numel(values),1);
+        res(m).([metrics{k} '_std']) = zeros(numel(values),1);
+    end
+end
+
+for m = 1:numel(route_modes)
+    mode = route_modes{m};
+
+    for vi = 1:numel(values)
+        p = base;
+        p.route_mode = mode;
+        p.(field) = values(vi);
+
+        % Apply energy-aware tree cfg if tool exists
+        if exist('apply_energy_aware_cfg','file') == 2
+            p = apply_energy_aware_cfg(p);
+        end
+
+        PDR_arr   = zeros(n_runs,1);
+        Dly_arr   = zeros(n_runs,1);
+        Hop_arr   = zeros(n_runs,1);
+        Alive_arr = zeros(n_runs,1);
+        E_arr     = zeros(n_runs,1);
+        FND_arr   = zeros(n_runs,1);
+        HND_arr   = zeros(n_runs,1);
+        LND_arr   = zeros(n_runs,1);
+
+        % Parallelize on runs (stable slicing)
+        parfor r = 1:n_runs
+            pr = p;
+            pr.seed = base_seed + 100000*m + 1000*vi + r;
+            rng(pr.seed, 'twister');
+
+            out = sim_func(pr);
+            f = out.final;
+
+            PDR_arr(r) = f.PDR;
+
+            % Map fields (support both naming styles)
+            if isfield(f,'Delay')
+                Dly_arr(r) = f.Delay;
+            elseif isfield(f,'avg_delay')
+                Dly_arr(r) = f.avg_delay;
+            else
+                Dly_arr(r) = NaN;
+            end
+
+            if isfield(f,'Hops')
+                Hop_arr(r) = f.Hops;
+            elseif isfield(f,'avg_hops')
+                Hop_arr(r) = f.avg_hops;
+            else
+                Hop_arr(r) = NaN;
+            end
+
+            if isfield(f,'Alive')
+                Alive_arr(r) = f.Alive;
+            elseif isfield(f,'alive_ratio')
+                Alive_arr(r) = f.alive_ratio;
+            else
+                Alive_arr(r) = NaN;
+            end
+
+            if isfield(f,'Esum')
+                E_arr(r) = f.Esum;
+            elseif isfield(f,'energy_total')
+                E_arr(r) = f.energy_total;
+            elseif isfield(f,'Etotal')
+                E_arr(r) = f.Etotal;
+            else
+                E_arr(r) = NaN;
+            end
+
+            % Lifetime
+            if isfield(f,'FND'), FND_arr(r) = f.FND; else, FND_arr(r) = NaN; end
+            if isfield(f,'HND'), HND_arr(r) = f.HND; else, HND_arr(r) = NaN; end
+            if isfield(f,'LND'), LND_arr(r) = f.LND; else, LND_arr(r) = NaN; end
+        end
+
+        % Mean + std
+        res(m).PDR(vi)           = mean(PDR_arr,'omitnan');
+        res(m).PDR_std(vi)       = std(PDR_arr,'omitnan');
+
+        res(m).avg_delay(vi)     = mean(Dly_arr,'omitnan');
+        res(m).avg_delay_std(vi) = std(Dly_arr,'omitnan');
+
+        res(m).avg_hops(vi)      = mean(Hop_arr,'omitnan');
+        res(m).avg_hops_std(vi)  = std(Hop_arr,'omitnan');
+
+        res(m).alive_ratio(vi)   = mean(Alive_arr,'omitnan');
+        res(m).alive_ratio_std(vi)= std(Alive_arr,'omitnan');
+
+        res(m).energy_total(vi)  = mean(E_arr,'omitnan');
+        res(m).energy_total_std(vi)= std(E_arr,'omitnan');
+
+        res(m).FND(vi)           = mean(FND_arr,'omitnan');
+        res(m).FND_std(vi)       = std(FND_arr,'omitnan');
+
+        res(m).HND(vi)           = mean(HND_arr,'omitnan');
+        res(m).HND_std(vi)       = std(HND_arr,'omitnan');
+
+        res(m).LND(vi)           = mean(LND_arr,'omitnan');
+        res(m).LND_std(vi)       = std(LND_arr,'omitnan');
+    end
+end
 end
