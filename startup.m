@@ -17,6 +17,7 @@ set(groot,'defaultAxesXColor','k');
 set(groot,'defaultAxesYColor','k');
 set(groot,'defaultAxesZColor','k');
 set(groot,'defaultLegendTextColor','k');
+set(groot,'defaultLegendInterpreter','none');
 
 end
 
