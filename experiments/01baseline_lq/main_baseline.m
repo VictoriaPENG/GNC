@@ -80,6 +80,11 @@ alive_ratio_ts = zeros(p.T,1);
 gen_ts   = zeros(p.T,1);
 deliv_ts = zeros(p.T,1);
 drop_ts  = zeros(p.T,1);
+if p.energy_trace
+    energy_idle_ts = zeros(p.T,1);
+    energy_tx_ts = zeros(p.T,1);
+    energy_rx_ts = zeros(p.T,1);
+end
 
 % 寿命统计（FND/HND/LND）
 FND = NaN; HND = NaN; LND = NaN;
@@ -91,7 +96,11 @@ for t = 1:p.T
     % 1) 空闲能耗
     E(1:p.N) = E(1:p.N) - p.Eidle;
     energy.idle = energy.idle + p.N * p.Eidle;
-
+    if p.energy_trace
+        step_idle = p.N * p.Eidle;
+        step_tx = 0;
+        step_rx = 0;
+    end
     alive(1:p.N) = alive(1:p.N) & (E(1:p.N) > 0);
 
     % 2) 随机失效
@@ -184,7 +193,9 @@ for t = 1:p.T
         % 发送能耗（每次尝试都会扣 → 重传自动计入能耗）
         E(i) = E(i) - p.Etx;
         energy.tx = energy.tx + p.Etx;
-
+        if p.energy_trace
+            step_tx = step_tx + p.Etx;
+        end
         if E(i) <= 0 && alive(i)
             diag.energy_dead = diag.energy_dead + 1;
         end
@@ -201,7 +212,9 @@ for t = 1:p.T
             if j ~= bs_idx
                 E(j) = E(j) - p.Erx;
                 energy.rx = energy.rx + p.Erx;
-
+                if p.energy_trace
+                    step_rx = step_rx + p.Erx;
+                end
                 if E(j) <= 0 && alive(j)
                     diag.energy_dead = diag.energy_dead + 1;
                 end
@@ -248,7 +261,11 @@ for t = 1:p.T
     gen_ts(t)   = gen_pkts;
     deliv_ts(t) = deliv_pkts;
     drop_ts(t)  = drop_pkts;
-
+    if p.energy_trace
+        energy_idle_ts(t) = step_idle;
+        energy_tx_ts(t) = step_tx;
+        energy_rx_ts(t) = step_rx;
+    end
     % --------- 寿命统计 ---------
     dead_count = sum(~alive(1:p.N));
     if dead_count > dead_count_prev
@@ -294,7 +311,12 @@ out = struct();
 out.final = final;
 out.time = struct("alive_ratio", alive_ratio_ts, "gen", gen_ts, "deliv", deliv_ts, "drop", drop_ts);
 out.diag = diag;
-
+if p.energy_trace
+    energy_total_ts = energy_idle_ts + energy_tx_ts + energy_rx_ts;
+    energy_cum_ts = cumsum(energy_total_ts);
+    out.time.energy = struct("idle", energy_idle_ts, "tx", energy_tx_ts, ...
+        "rx", energy_rx_ts, "total", energy_total_ts, "cum", energy_cum_ts);
+end
 if p.verbose
     fprintf("\n=== Simulation Results (route_mode=%s) ===\n", p.route_mode);
     fprintf("Generated packets: %d\n", gen_pkts);
@@ -430,6 +452,7 @@ def.MAX_RETX = 5;
 def.route_mode = 'mix';
 def.seed = 1;
 def.verbose = false;
+def.energy_trace = false;
 
 % 重传放队尾（更推荐，避免"卡死"）
 def.RETX_TO_TAIL = true;
