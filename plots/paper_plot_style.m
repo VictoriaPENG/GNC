@@ -11,7 +11,7 @@ S.figureW_in = 3.5;    % 单栏图宽度（inches），双栏可用 7.2
 S.figureH_in = 2.6;
 
 S.legendLocation = 'best';
-S.legendBox = 'off';
+S.legendBox = 'on';
 
 S.useMinorGrid = true;
 S.useCIShade   = true;    % true=阴影置信带；false=误差棒
@@ -19,4 +19,5 @@ S.ciZ          = 1.96;    % 95% normal approx
 
 % 导出
 S.exportDPI = 300;
+
 end

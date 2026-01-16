@@ -9,6 +9,7 @@ addpath(genpath(fullfile(root,'experiments')));
 addpath(genpath(fullfile(root,'tools')));
 
 rehash;
+
 disp("GNC project initialized: core/ plots/ experiments/ added to path");
 set(groot,'defaultFigureColor','w');
 set(groot,'defaultAxesColor','w');
@@ -17,7 +18,9 @@ set(groot,'defaultAxesXColor','k');
 set(groot,'defaultAxesYColor','k');
 set(groot,'defaultAxesZColor','k');
 set(groot,'defaultLegendTextColor','k');
+set(groot,'defaultLegendColor','w');
+set(groot,'defaultLegendEdgeColor','k');
 set(groot,'defaultLegendInterpreter','none');
-
+apply_paper_plot_style; 
 end
 

@@ -37,7 +37,7 @@ n_runs = 20;            % 有并行后建议 8~20
 base_seed = 1;
 
 %% ============ 论文级绘图风格 ============
-S = paper_plot_style();
+S = paper_plot_style;
 
 %% ============ 基础参数（固定项） ============
 base = struct();
@@ -163,42 +163,52 @@ for tm = 1:numel(topo_modes)
     res_Rc     = sweep_param_parallel(route_modes, n_runs, base_seed, base_this, 'Rc',     Rc_list);
 
     %% --- 画论文级曲线（均值 + 95%CI） ---
+
+    
     plot_metric_vs_param_paper(res_lambda, lambda_list, ...
         'PDR', 'PDR', '\lambda (packet generation probability)', ...
         fullfile(outdir,'PDR_vs_lambda'), n_runs, ...
         'Style', S, 'CI', true, 'Legend', true);
+    
 
     plot_metric_vs_param_paper(res_lambda, lambda_list, ...
         'avg_delay', 'Average Delay (steps)', '\lambda (packet generation probability)', ...
         fullfile(outdir,'Delay_vs_lambda'), n_runs, ...
         'Style', S, 'CI', true, 'Legend', true);
+    
 
     plot_metric_vs_param_paper(res_alpha, alpha_list, ...
         'PDR', 'PDR', '\alpha (path-loss factor)', ...
         fullfile(outdir,'PDR_vs_alpha'), n_runs, ...
         'Style', S, 'CI', true, 'Legend', true);
+    
 
     plot_metric_vs_param_paper(res_N, N_list, ...
         'avg_delay', 'Average Delay (steps)', 'N (number of sensors)', ...
         fullfile(outdir,'Delay_vs_N'), n_runs, ...
         'Style', S, 'CI', true, 'Legend', true);
+    
 
     plot_metric_vs_param_paper(res_N, N_list, ...
         'energy_total', 'Total Energy (idle+tx+rx)', 'N (number of sensors)', ...
         fullfile(outdir,'Energy_vs_N'), n_runs, ...
         'Style', S, 'CI', true, 'Legend', true);
+    
 
     plot_metric_vs_param_paper(res_Rc, Rc_list, ...
         'PDR', 'PDR', 'R_c (communication radius, m)', ...
         fullfile(outdir,'PDR_vs_Rc'), n_runs, ...
         'Style', S, 'CI', true, 'Legend', true);
+    
 
     %% --- 代表性 AliveRatio vs Time（每策略跑 1 次） ---
     plot_alive_ratio_vs_time(route_modes, base_seed, base_this, S, fullfile(outdir,'AliveRatio_vs_Time'));
+    
 
     %% --- 寿命指标（FND/HND/LND）并行统计 + 条形图 ---
     life = sweep_single_point_parallel(route_modes, n_runs, base_seed, base_this);
     plot_lifetime_bar(life, n_runs, S, fullfile(outdir,'Lifetime_FND_HND_LND'));
+    
 
     %% --- 保存本拓扑结果 ---
     results = struct();
@@ -324,7 +334,7 @@ for m = 1:numel(route_modes)
         % --- 汇总（均值/标准差） ---
         res(m).PDR(vi)           = mean(PDR_arr);
         res(m).PDR_std(vi)       = std(PDR_arr);
-
+ 
         res(m).avg_delay(vi)     = mean(delay_arr);
         res(m).avg_delay_std(vi) = std(delay_arr);
 

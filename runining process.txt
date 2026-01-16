@@ -10,7 +10,7 @@ setenv('GNC_TAG','energy_aware_tree_v1')
 
 3）运行实验：
 
-cd experiments/topo_tree
+cd experiments/topo_tree 
 run_topo_tree
 
 

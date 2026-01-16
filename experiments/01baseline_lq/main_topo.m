@@ -437,7 +437,7 @@ function p = fill_defaults(p)
 def = struct();
 def.Lx = 1000; def.Ly = 1000;
 def.N  = 700;
-def.Rc = 150;
+def.Rc = 70;
 def.T  = 2000;
 
 def.BS_pos   = [500, 500];

@@ -172,6 +172,7 @@ for tm = 1:numel(topo_modes)
         'avg_delay', 'Average Delay (steps)', '\lambda (packet generation probability)', ...
         fullfile(outdir,'Delay_vs_lambda'), n_runs, ...
         'Style', S, 'CI', true, 'Legend', true);
+   
 
     plot_metric_vs_param_paper(res_alpha, alpha_list, ...
         'PDR', 'PDR', '\alpha (path-loss factor)', ...
@@ -196,9 +197,11 @@ for tm = 1:numel(topo_modes)
     %% --- 代表性 AliveRatio vs Time（每策略跑 1 次） ---
     plot_alive_ratio_vs_time(route_modes, base_seed, base_this, S, fullfile(outdir,'AliveRatio_vs_Time'));
 
+
     %% --- 寿命指标（FND/HND/LND）并行统计 + 条形图 ---
     life = sweep_single_point_parallel(route_modes, n_runs, base_seed, base_this);
     plot_lifetime_bar(life, n_runs, S, fullfile(outdir,'Lifetime_FND_HND_LND'));
+
 
     %% --- 保存本拓扑结果 ---
     results = struct();

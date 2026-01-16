@@ -122,6 +122,18 @@ time.alive_ratio = zeros(p.T,1);
 time.generated = zeros(p.T,1);
 time.delivered = zeros(p.T,1);
 
+% =========================
+% Time-series statistics (for PDR vs time)
+% =========================
+T = p.T;
+
+gen_total   = 0;          % 累计生成包
+deliv_total = 0;          % 累计送达包
+
+gen_cum   = zeros(T,1);   % 累计生成
+deliv_cum = zeros(T,1);   % 累计送达
+pdr_cum   = zeros(T,1);   % 累计 PDR
+
 %% ============ 仿真主循环 ============
 for t = 1:p.T
 
@@ -554,7 +566,7 @@ function p = fill_defaults(p)
 def = struct();
 def.Lx = 1000; def.Ly = 1000;
 def.N  = 700;
-def.Rc = 150;
+def.Rc = 70;
 def.T  = 2000;
 
 def.BS_pos   = [500, 500];
