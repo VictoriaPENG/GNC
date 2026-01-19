@@ -87,7 +87,7 @@ end
 
 % 去白边（论文排版更干净）
 tight_inset(ax);
-
+paper_plot_style(fig);
 % 导出（矢量优先）
 export_figure(fig, savebase, S);
 

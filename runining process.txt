@@ -1,0 +1,19 @@
+1）每次开工程先：
+
+startup
+
+
+2）跑某个实验前先打 tag：
+
+setenv('GNC_TAG','energy_aware_tree_v1')
+
+
+3）运行实验：
+
+cd experiments/topo_tree 
+run_topo_tree
+
+
+4）所有结果都在：
+
+results/topo_tree/<run_id>/...
