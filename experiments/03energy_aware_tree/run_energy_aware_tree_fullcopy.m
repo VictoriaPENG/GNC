@@ -1,4 +1,4 @@
-function run_energy_aware_tree()
+function run_energy_aware_tree_fullcopy()
 % ============================================================
 % run_energy_aware_tree.m
 % ------------------------------------------------------------
@@ -47,7 +47,7 @@ base.seed = base_seed;
 % 网络与仿真
 base.Lx = 1000; base.Ly = 1000;
 base.N  = 700;
-base.Rc = 150;
+base.Rc = 70;
 base.T  = 2000;
 
 % 基站/火区（热点默认可用 fire_pos）

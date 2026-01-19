@@ -47,7 +47,7 @@ base.seed = base_seed;
 % 网络与仿真
 base.Lx = 1000; base.Ly = 1000;
 base.N  = 700;
-base.Rc = 150;
+base.Rc = 70;
 base.T  = 2000;
 
 % 基站/火区（热点默认可用 fire_pos）
@@ -112,7 +112,7 @@ base.road_node_ratio = 0.80; % road 模式下，非均匀节点中有多少沿�
 lambda_list = [0.01 0.02 0.05 0.08 0.10];
 alpha_list  = [0.005 0.01 0.02 0.03 0.04];
 N_list      = [200 400 700 1000];
-Rc_list     = [100 120 150 180 220];
+Rc_list     = [40 60 80 100 120 150 180 220];
 
 %% ============ 可追溯输出目录（Run ID + Tag） ============
 % 你可以：setenv('GNC_TAG','v02_tree') 来标记本次实验版本
@@ -264,6 +264,7 @@ legend(ax, route_modes, 'Location', S.legendLocation, 'Box', S.legendBox, ...
     'FontName', S.fontName, 'FontSize', S.fontSize-1);
 
 tight_inset(ax);
+paper_plot_style(gcf);   % ★ 统一 apply 论文风格（你已合并 apply）
 export_figure(gcf, savebase, S);
 close(gcf);
 
@@ -432,6 +433,7 @@ legend(ax, {'FND','HND','LND'}, 'Location', S.legendLocation, 'Box', S.legendBox
     'FontName', S.fontName, 'FontSize', S.fontSize-1);
 
 tight_inset(ax);
+paper_plot_style(gcf);   % ★ 统一 apply 论文风格（你已合并 apply）
 export_figure(gcf, savebase, S);
 close(gcf);
 
@@ -447,7 +449,7 @@ end
 function tight_inset(ax)
 outer = ax.OuterPosition;
 ti = ax.TightInset;
-left = outer(1) + ti(1);
+left = outer(1) + ti(1); 
 bottom = outer(2) + ti(2);
 ax_width = outer(3) - ti(1) - ti(3);
 ax_height = outer(4) - ti(2) - ti(4);
