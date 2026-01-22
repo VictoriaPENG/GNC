@@ -31,8 +31,6 @@ fprintf('[plot_model_validation_figs] outdir = %s\n', p.outdir);
 
 %% F1-1 拓扑可视化
 fig1_path = fullfile(p.outdir, 'F1-1_topology.png');
-apply_paper_plot_style;
-
 visualize_baseline_lq_topology(struct( ...
     'topo_mode', p.topo_mode, ...
     'N', p.N, ...
@@ -43,8 +41,18 @@ visualize_baseline_lq_topology(struct( ...
     'fire_pos', p.fire_pos, ...
     'Rf', p.Rf, ...
     'seed', p.seed, ...
-    'show_links', p.show_links, ...
+    'show_links', true, ...%p.show_links
     'save_path', fig1_path));
+%%生成多个拓扑图
+fig_abc_path = fullfile(p.outdir, 'F1-1_topology_abc.png');
+
+plot_topology_abc_paper(struct( ...
+    'N', p.N, 'Lx', p.Lx, 'Ly', p.Ly, 'Rc', p.Rc, ...
+    'BS_pos', p.BS_pos, 'fire_pos', p.fire_pos, 'Rf', p.Rf, ...
+    'seed', p.seed, ...
+    'show_links', false, ...          % 建议关掉，否则三幅都很乱
+    'node_size_abc', 10, ...          % 点更清爽
+    'save_path', fig_abc_path));
 
 %% F1-2 连通率 vs Rc
 Rc_list = p.Rc_list;
@@ -59,7 +67,6 @@ ylabel('Connectivity ratio');
 title('F1-2 Connectivity vs R_c');
 grid on;
 apply_paper_plot_style;
-
 save_figure(fig, fullfile(p.outdir, 'F1-2_connectivity_vs_Rc'));
 
 %% F1-3 PRR / ETX vs 距离
@@ -292,23 +299,8 @@ close(fig);
 end
 
 function p = fill_defaults(p)
-def = struct();
-def.Lx = 1000; def.Ly = 1000;
-def.N  = 700;
-def.Rc = 70;
-def.T  = 2000;
-
-def.BS_pos   = [500, 500];
-def.fire_pos = [250, 250];
-def.Rf = 220;
-
-def.lambda = 0.05;
-def.alpha = 0.01;
-def.prr_floor = 0.08;
-
-def.seed = 1;
+def = default_system_params();
 def.route_mode = 'mix';
-def.verbose = false;
 
 def.topo_mode = 'uniform';
 
@@ -329,7 +321,7 @@ def.road_node_ratio = 0.8;
 
 def.show_links = false;
 def.outdir = fullfile(pwd, 'figs_model_validation');
-def.Rc_list =  [20 30 40 50 60 80 100 120 150 180 220];
+def.Rc_list =  [20 40 60 80 100 120 150 180 220];
 def.lambda_list = [0.01 0.02 0.05 0.08 0.10];
 def.prr_dist_max = 300;
 def.n_runs = 5;

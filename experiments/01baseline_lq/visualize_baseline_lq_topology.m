@@ -104,8 +104,12 @@ bs_pos = topo.BS_pos;
 
 is_fire_node = vecnorm(pos - p.fire_pos, 2, 2) <= p.Rf;
 
-fig = figure('Color','w');
+fig = figure(...
+    'Units','centimeters', ...
+    'Position',[2 2 20 20], ...
+    'Color','w');
 hold on; axis equal;
+axis([0 p.Lx 0 p.Ly]);
 xlim([0 p.Lx]); ylim([0 p.Ly]);
 title(sprintf('baseline\\_lq Topology (%s)', p.topo_mode), 'Interpreter','none');
 xlabel('X (m)'); ylabel('Y (m)');
@@ -125,15 +129,21 @@ if p.show_links
     end
     legend_handles(end+1) = plot(nan, nan, '-', 'Color', [0.85 0.85 0.85], 'LineWidth', 0.5); 
     legend_labels{end+1} = 'Links'; 
-    paper_plot_style(fig);
 
 
 end
 
 h_nodes = scatter(pos(~is_fire_node,1), pos(~is_fire_node,2), ...
-    p.node_size, p.node_color, 'filled');
+    p.node_size, p.node_color, 'filled', 'MarkerEdgeColor','none');
 h_fire_nodes = scatter(pos(is_fire_node,1), pos(is_fire_node,2), ...
-    p.node_size + 10, p.fire_node_color, 'filled');
+    p.node_size + 4, p.fire_node_color, 'filled', 'MarkerEdgeColor','none');
+
+% ✅ 半透明（R2025b 支持 MarkerFaceAlpha）
+if isfield(p,'node_alpha') && ~isempty(p.node_alpha)
+    h_nodes.MarkerFaceAlpha = p.node_alpha;
+    h_fire_nodes.MarkerFaceAlpha = min(1, p.node_alpha + 0.2);
+end
+
 
 h_bs = plot(bs_pos(1), bs_pos(2), 'p', 'MarkerSize', 14, ...
     'MarkerEdgeColor', 'k', 'MarkerFaceColor', p.bs_color);
@@ -161,8 +171,9 @@ end
 
 legend_handles = [legend_handles, h_nodes, h_fire_nodes, h_bs, h_fire];
 legend_labels = [legend_labels, {'Sensors','Fire sensors','Base station','Fire region'}];
-legend(legend_handles, legend_labels, 'Location','bestoutside');
-paper_plot_style(fig);
+lgd = legend(legend_handles, legend_labels, ...
+    'Location','southoutside', 'Orientation','horizontal');
+lgd.Box = 'off';
 
 grid on;
 
@@ -171,22 +182,12 @@ if ~isempty(p.save_path)
     if ~isempty(save_dir) && ~exist(save_dir,'dir')
         mkdir(save_dir);
     end
-    saveas(fig, p.save_path);
+    exportgraphics(fig, p.save_path, 'Resolution', 300);  % 300dpi 论文常用
 end
 end
 
 function p = fill_defaults(p)
-def = struct();
-def.Lx = 1000; def.Ly = 1000;
-def.N  = 700;
-def.Rc = 80;
-def.T  = 2000;
-
-def.BS_pos   = [500, 500];
-def.fire_pos = [250, 250];
-def.Rf = 220;
-
-def.seed = 1;
+def = default_system_params();
 
 % 拓扑模式
 def.topo_mode = 'uniform';
@@ -211,8 +212,9 @@ def.road_mix_uniform_ratio = 0.2;
 def.road_node_ratio = 0.8;
 
 % 可视化配置
-def.show_links = false;
-def.node_size = 18;
+def.show_links = true;
+def.node_size = max(4, min(12, round(6000 / def.N)));   % N=500 -> ~12, N=1000 -> ~6
+def.node_alpha = 0.55;   % 半透明（只影响拓扑图）
 def.node_color = [0.2 0.2 0.2];
 def.fire_node_color = [0.85 0.2 0.2];
 def.bs_color = [0.1 0.4 0.9];

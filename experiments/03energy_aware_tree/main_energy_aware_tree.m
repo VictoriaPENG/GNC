@@ -563,39 +563,7 @@ end
 
 %% ==================== 默认参数填充 ====================
 function p = fill_defaults(p)
-def = struct();
-def.Lx = 1000; def.Ly = 1000;
-def.N  = 700;
-def.Rc = 70;
-def.T  = 2000;
-
-def.BS_pos   = [500, 500];
-def.fire_pos = [250, 250];
-def.Rf = 220;
-
-def.lambda = 0.05;
-
-def.alpha = 0.01;
-def.prr_floor = 0.08;
-def.noise_sigma = 0.02;
-
-def.USE_PRR_TH = true;
-def.PRR_MIN = 0.15;
-
-def.E0    = 100;
-def.Etx   = 0.9;
-def.Erx   = 0.4;
-def.Eidle = 0.001;
-
-def.p_rand = 1e-5;
-def.beta_fire = 0.05;
-def.fire_kill_scale = 1e-4;
-
-def.Qmax   = 50;
-def.TTLmax = 25;
-def.Ksend = 20;
-def.MAX_RETX = 5;
-
+def = default_system_params();
 def.route_mode = 'mix';
 
 % ==================== 汇聚树（Converge Tree）路由参数 ====================
@@ -610,8 +578,7 @@ def.tree_rebuild_period = inf;         % 每隔多少步重建一次（inf=不�
 def.tree_energy_aware = false;         % 是否启用能量感知建树（Energy-aware Tree）
 def.tree_energy_beta  = 2.0;           % 能量惩罚强度（越大越偏向选择高能量父节点）
 def.tree_energy_min_frac = 0.10;       % 残余能量归一化下限（避免权重过大）
-def.seed = 1;
-def.verbose = false;
+
 
 % 合并默认
 fn = fieldnames(def);

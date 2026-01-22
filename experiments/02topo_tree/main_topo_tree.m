@@ -542,39 +542,7 @@ end
 
 %% ==================== 默认参数填充 ====================
 function p = fill_defaults(p)
-def = struct();
-def.Lx = 1000; def.Ly = 1000;
-def.N  = 700;
-def.Rc = 150;
-def.T  = 2000;
-
-def.BS_pos   = [500, 500];
-def.fire_pos = [250, 250];
-def.Rf = 220;
-
-def.lambda = 0.05;
-
-def.alpha = 0.01;
-def.prr_floor = 0.08;
-def.noise_sigma = 0.02;
-
-def.USE_PRR_TH = true;
-def.PRR_MIN = 0.15;
-
-def.E0    = 100;
-def.Etx   = 0.9;
-def.Erx   = 0.4;
-def.Eidle = 0.001;
-
-def.p_rand = 1e-5;
-def.beta_fire = 0.05;
-def.fire_kill_scale = 1e-4;
-
-def.Qmax   = 50;
-def.TTLmax = 25;
-def.Ksend = 20;
-def.MAX_RETX = 5;
-
+def = default_system_params();
 def.route_mode = 'mix';
 
 % ==================== 汇聚树（Converge Tree）路由参数 ====================
@@ -585,8 +553,7 @@ def.route_mode = 'mix';
 %   - 如果 parent(i) 不可用（不连通/死亡），会自动回退到 etx 选路，保证不崩。
 def.tree_cost = 'etx';                 % 'etx' | 'hop'
 def.tree_rebuild_period = inf;         % 每隔多少步重建一次（inf=不重建）
-def.seed = 1;
-def.verbose = false;
+
 
 % ==================== 拓扑模式（2.1 补充） ====================
 % 支持：'uniform'（随机均匀）/ 'cluster'（分簇）/ 'road'（沿道路）

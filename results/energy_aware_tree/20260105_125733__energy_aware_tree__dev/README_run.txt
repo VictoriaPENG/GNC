@@ -1,2 +1,0 @@
-Experiment: energy_aware_tree
-Run ID: 20260105_125733__energy_aware_tree__dev

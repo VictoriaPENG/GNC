@@ -520,39 +520,7 @@ end
 
 %% ==================== Defaults ====================
 function p = fill_defaults(p)
-def = struct();
-def.Lx = 1000; def.Ly = 1000;
-def.N  = 700;
-def.Rc = 150;
-def.T  = 2000;
-
-def.BS_pos   = [500, 500];
-def.fire_pos = [250, 250];
-def.Rf = 220;
-
-def.lambda = 0.05;
-
-def.alpha = 0.01;
-def.prr_floor = 0.08;
-def.noise_sigma = 0.02;
-
-def.USE_PRR_TH = true;
-def.PRR_MIN = 0.15;
-
-def.E0    = 100;
-def.Etx   = 0.9;
-def.Erx   = 0.4;
-def.Eidle = 0.001;
-
-def.p_rand = 1e-5;
-def.beta_fire = 0.05;
-def.fire_kill_scale = 1e-4;
-
-def.Qmax   = 50;
-def.TTLmax = 25;
-def.Ksend = 20;
-def.MAX_RETX = 5;
-
+def = default_system_params();
 def.route_mode = 'tree_energy_aodv';
 
 def.tree_cost = 'etx';
@@ -567,9 +535,6 @@ def.local_switch_energy_min = 0.15;
 def.local_switch_gain = 0.10;
 def.local_switch_hop_weight = 0.10;
 def.local_switch_hop_strict = true;
-
-def.seed = 1;
-def.verbose = false;
 
 fn = fieldnames(def);
 for k = 1:numel(fn)

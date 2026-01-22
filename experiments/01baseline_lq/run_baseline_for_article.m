@@ -106,7 +106,7 @@ alpha_list = [0.005 0.01 0.02 0.03 0.04];
 N_list = [200 400 700 1000];
 
 % 4) 可选：PDR vs Rc（网络稠密度）
-Rc_list = [100 120 150 180 220];
+Rc_list = [40 60 80 100 120 150 180 220];
 
 %% ============ 开始跑实验 ============
 fprintf("Running baselines with n_runs=%d ...\n", n_runs);

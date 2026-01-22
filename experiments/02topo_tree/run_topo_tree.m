@@ -41,7 +41,7 @@ S = paper_plot_style();
 
 %% ============ 基础参数（固定项） ============
 base = struct();
-base.verbose = true;
+base.verbose = false;
 base.seed = base_seed;
 
 % 网络与仿真
