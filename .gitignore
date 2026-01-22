@@ -21,6 +21,10 @@ Thumbs.db
 data/raw/
 *.mat
 *.csv
-
+# 但允许同步 results 中的
+!results/**/*.mat
+!results/**/*.csv
+!results/**/*.png
+!results/**/*.pdf
 # ===== Logs =====
 *.log
