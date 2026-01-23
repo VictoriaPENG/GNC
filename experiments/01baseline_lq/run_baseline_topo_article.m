@@ -90,6 +90,9 @@ base.RETX_TO_TAIL = true;
 topo_modes = {'uniform','cluster','road'};
 %topo_modes = {'uniform'};
 
+RES_LAMBDA = struct(); % 存三拓扑的res_lambda
+LIFE = struct();
+
 % 统一是否叠加“热点区域很多传感器”
 base.hotspot_enable = false; % 如需启用，改为 true
 base.hotspot_ratio  = 0.30;  % 30% 节点聚集
@@ -175,6 +178,22 @@ for tm = 1:numel(topo_modes)
         'avg_delay', 'Average Delay (steps)', '\lambda (packet generation probability)', ...
         fullfile(outdir,'Delay_vs_lambda'), n_runs, ...
         'Style', S, 'CI', true, 'Legend', true);
+
+
+    % --- NEW: Hops vs lambda ---
+    plot_metric_vs_param_paper(res_lambda, lambda_list, ...
+        'avg_hops', 'Average Hops', '\lambda (packet generation probability)', ...
+        fullfile(outdir,'Hops_vs_lambda'), n_runs, ...
+        'Style', S, 'CI', true, 'Legend', true);
+    
+
+    % --- NEW: Energy per delivered packet (proxy) vs lambda ---
+    % 说明：若每个点生成包数在不同策略间相同，则 energy_total/PDR 是"每成功包能耗"的有效代理
+    plot_derived_metric_vs_param_paper(res_lambda, lambda_list, ...
+        'energy_total', 'PDR', 'ratio', ...
+        'Energy per delivered (Energy/PDR, proxy)', '\lambda (packet generation probability)', ...
+        fullfile(outdir,'EnergyPerDelivered_vs_lambda'), n_runs, ...
+        'Style', S, 'CI', true, 'Legend', true);
     
 
     plot_metric_vs_param_paper(res_alpha, alpha_list, ...
@@ -222,16 +241,45 @@ for tm = 1:numel(topo_modes)
     results.life       = life;
     results.meta       = meta;
     results.cfg        = cfg;
+    RES_LAMBDA.(topo_mode) = res_lambda;
+    LIFE.(topo_mode) = life;
 
     save(fullfile(outdir,'results_baseline_topo.mat'), '-struct', 'results');
     fprintf("Saved results to: %s\n", outdir);
 end
+
 
 summary = struct();
 summary.topo_modes = topo_modes;
 summary.route_modes = route_modes;
 summary.n_runs = n_runs;
 save_run_metadata(root_outdir, meta, 'Config', cfg, 'ResultsSummary', summary);
+
+outABC = fullfile(root_outdir,'ABC');
+if ~exist(outABC,'dir'), mkdir(outABC); end
+
+resU = RES_LAMBDA.uniform;
+resC = RES_LAMBDA.cluster;
+resR = RES_LAMBDA.road;
+
+plot_metric_vs_param_abc_paper(resU,resC,resR, lambda_list, ...
+    'PDR','PDR','\lambda (packet generation probability)', ...
+    fullfile(outABC,'PDR_vs_lambda_abc'), n_runs, 'Style', S, 'CI', true, 'Legend', true);
+
+plot_metric_vs_param_abc_paper(resU,resC,resR, lambda_list, ...
+    'avg_delay','Average Delay (steps)','\lambda (packet generation probability)', ...
+    fullfile(outABC,'Delay_vs_lambda_abc'), n_runs, 'Style', S, 'CI', true, 'Legend', true);
+
+plot_metric_vs_param_abc_paper(resU,resC,resR, lambda_list, ...
+    'avg_hops','Average Hops','\lambda (packet generation probability)', ...
+    fullfile(outABC,'Hops_vs_lambda_abc'), n_runs, 'Style', S, 'CI', true, 'Legend', true);
+
+plot_strategy_summary_bar_abc_paper( ...
+    RES_LAMBDA.uniform, LIFE.uniform, ...
+    RES_LAMBDA.cluster, LIFE.cluster, ...
+    RES_LAMBDA.road,    LIFE.road, ...
+    lambda_list, base.lambda, n_runs, S, ...
+    fullfile(outABC,'Strategy_Summary_Normalized_abc'));
 
 fprintf("ALL DONE. Outputs saved under: %s", root_outdir);
 
