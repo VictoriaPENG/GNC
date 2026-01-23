@@ -523,18 +523,8 @@ function p = fill_defaults(p)
 def = default_system_params();
 def.route_mode = 'tree_energy_aodv';
 
-def.tree_cost = 'etx';
 def.tree_rebuild_period = 50;
 def.tree_energy_aware = true;
-def.tree_energy_beta  = 2.0;
-def.tree_energy_min_frac = 0.10;
-
-def.local_switch_enable = false;
-def.local_switch_prr_min = 0.20;
-def.local_switch_energy_min = 0.15;
-def.local_switch_gain = 0.10;
-def.local_switch_hop_weight = 0.10;
-def.local_switch_hop_strict = true;
 
 fn = fieldnames(def);
 for k = 1:numel(fn)

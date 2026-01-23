@@ -564,21 +564,6 @@ end
 %% ==================== 默认参数填充 ====================
 function p = fill_defaults(p)
 def = default_system_params();
-def.route_mode = 'mix';
-
-% ==================== 汇聚树（Converge Tree）路由参数 ====================
-% route_mode 取值：
-%   - 'tree' / 'tree_etx' : 使用 ETX 代价构建汇聚树，转发固定走 parent(i)
-%   - 'tree_minhop'       : 使用 hop 代价构建汇聚树，转发固定走 parent(i)
-%   - 'tree_energy'       : 使用 ETX + 能量惩罚构建汇聚树（Energy-aware Tree）
-% 说明：
-%   - 如果 parent(i) 不可用（不连通/死亡），会自动回退到 etx 选路，保证不崩。
-def.tree_cost = 'etx';                 % 'etx' | 'hop'
-def.tree_rebuild_period = inf;         % 每隔多少步重建一次（inf=不重建）
-def.tree_energy_aware = false;         % 是否启用能量感知建树（Energy-aware Tree）
-def.tree_energy_beta  = 2.0;           % 能量惩罚强度（越大越偏向选择高能量父节点）
-def.tree_energy_min_frac = 0.10;       % 残余能量归一化下限（避免权重过大）
-
 
 % 合并默认
 fn = fieldnames(def);

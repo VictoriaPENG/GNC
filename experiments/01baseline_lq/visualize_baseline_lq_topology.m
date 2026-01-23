@@ -189,41 +189,6 @@ end
 function p = fill_defaults(p)
 def = default_system_params();
 
-% 拓扑模式
-def.topo_mode = 'uniform';
-def.topo_modes = {};
-
-% hotspot 参数
-def.hotspot_enable = false;
-def.hotspot_ratio  = 0.25;
-def.hotspot_sigma  = min(def.Lx,def.Ly)*0.05;
-def.hotspot_center = def.fire_pos;
-
-% cluster 参数
-def.Kc = 6;
-def.cluster_sigma = min(def.Lx,def.Ly)*0.06;
-def.cluster_center_mode = 'random';
-def.cluster_mix_uniform_ratio = 0.2;
-
-% road 参数
-def.road_count = 2;
-def.road_width = min(def.Lx,def.Ly)*0.01;
-def.road_mix_uniform_ratio = 0.2;
-def.road_node_ratio = 0.8;
-
-% 可视化配置
-def.show_links = true;
-def.node_size = max(4, min(12, round(6000 / def.N)));   % N=500 -> ~12, N=1000 -> ~6
-def.node_alpha = 0.55;   % 半透明（只影响拓扑图）
-def.node_color = [0.2 0.2 0.2];
-def.fire_node_color = [0.85 0.2 0.2];
-def.bs_color = [0.1 0.4 0.9];
-def.road_color = [0.2 0.6 0.2];
-def.hotspot_color = [0.7 0.2 0.7];
-def.fire_circle_style = '--r';
-def.fire_circle_width = 1.5;
-def.save_path = '';
-
 fn = fieldnames(def);
 for k = 1:numel(fn)
     f = fn{k};

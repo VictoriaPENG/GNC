@@ -29,6 +29,29 @@ def.fire_pos = [250, 250];
 def.Rf = 220;
 % Rf : 火源/事件影响半径（m）。半径内节点可能产生更高业务、或受到更高损毁概率等。
 
+%% ========== 2.1) 拓扑生成与热点/分簇/道路参数 ==========
+def.topo_mode = 'uniform';
+% topo_mode : 拓扑生成模式
+%   - 'uniform'（随机均匀）/ 'cluster'（分簇）/ 'road'（沿道路）
+
+% hotspot：支持"一个区域很多传感器"（可叠加到任意 topo_mode）
+def.hotspot_enable = false;
+def.hotspot_ratio  = 0.25;                   % 热点节点比例
+def.hotspot_sigma  = min(def.Lx,def.Ly)*0.05;% 热点扩散尺度（标准差）
+def.hotspot_center = def.fire_pos;           % 默认以火区为热点中心
+
+% cluster 参数
+def.Kc = 6;                                  % 簇数量
+def.cluster_sigma = min(def.Lx,def.Ly)*0.06; % 簇内扩散尺度
+def.cluster_center_mode = 'random';          % 'random' 或 'grid'
+def.cluster_mix_uniform_ratio = 0.2;         % 混入均匀节点比例
+
+% road 参数
+def.road_count = 2;                          % 自动生成道路数量（未提供 roads 时）
+def.road_width = min(def.Lx,def.Ly)*0.01;    % 道路横向扩散尺度（标准差）
+def.road_mix_uniform_ratio = 0.2;            % 混入均匀节点比例
+def.road_node_ratio = 0.8;                   % 非均匀部分中，沿道路采样比例
+
 %% ========== 3) 业务产生参数 ==========
 def.lambda = 0.05;
 % lambda : 节点每时隙产生数据包的概率/到达率（常见建模为 Bernoulli 或 Poisson 强度）。
@@ -95,6 +118,50 @@ def.MAX_RETX = 5;
 % MAX_RETX : MAC 层最大重传次数（链路失败后的重试上限）。
 %            重传越多 -> PDR 可能上升，但能耗与时延也会增加。
 
+def.RETX_TO_TAIL = true;
+% RETX_TO_TAIL : 重传包是否放队列尾部（true 更避免"卡死"）。
+
+%% ========== 8.1) 路由/建树与能量感知参数 ==========
+def.route_mode = 'mix';
+% route_mode : 路由策略（如 mix/tree/tree_minhop/tree_energy/tree_energy_aodv 等）
+
+def.tree_cost = 'etx';
+% tree_cost : 汇聚树代价（'etx' | 'hop'）
+
+def.tree_rebuild_period = inf;
+% tree_rebuild_period : 汇聚树重建周期（inf=不重建）
+
+def.tree_energy_aware = false;
+% tree_energy_aware : 是否启用能量感知建树（Energy-aware Tree）
+
+def.tree_energy_beta  = 2.0;
+% tree_energy_beta : 能量惩罚强度（越大越偏向选择高能量父节点）
+
+def.tree_energy_min_frac = 0.10;
+% tree_energy_min_frac : 残余能量归一化下限（避免权重过大）
+
+def.local_switch_enable = false;
+% local_switch_enable : 是否启用局部切换/修复（AODV hybrid 模式用）
+
+def.local_switch_prr_min = 0.20;
+% local_switch_prr_min : 局部切换最小 PRR 阈值
+
+def.local_switch_energy_min = 0.15;
+% local_switch_energy_min : 局部切换最小能量阈值（剩余能量比例）
+
+def.local_switch_gain = 0.10;
+% local_switch_gain : 局部切换收益阈值
+
+def.local_switch_hop_weight = 0.10;
+% local_switch_hop_weight : hop 惩罚权重
+
+def.local_switch_hop_strict = true;
+% local_switch_hop_strict : 是否严格限制 hop 变差
+
+%% ========== 8.2) 统计/能耗跟踪 ==========
+def.energy_trace = false;
+% energy_trace : 是否记录每时隙能耗时间序列（用于绘图/分析）
+
 %% ========== 9) 可复现实验与日志 ==========
 def.seed = 1;
 % seed : 随机种子。用于可复现拓扑、链路噪声、业务产生、随机故障等随机过程。
@@ -102,4 +169,31 @@ def.seed = 1;
 def.verbose = false;
 % verbose : 是否输出详细日志/调试信息。true 会打印更多过程信息但仿真更慢。
 
+%% ========== 10) 可视化/绘图参数 ==========
+def.topo_modes = {};
+% topo_modes : 指定需要展示的拓扑模式列表（空=单一模式）
+
+def.show_links = true;
+% show_links : 是否显示连边
+
+def.node_size = max(4, min(12, round(6000 / def.N)));
+% node_size : 节点绘图大小（随 N 自适应）
+
+def.node_alpha = 0.55;
+% node_alpha : 节点透明度
+
+def.node_color = [0.2 0.2 0.2];
+def.fire_node_color = [0.85 0.2 0.2];
+def.bs_color = [0.1 0.4 0.9];
+def.road_color = [0.2 0.6 0.2];
+def.hotspot_color = [0.7 0.2 0.7];
+
+def.fire_circle_style = '--r';
+def.fire_circle_width = 1.5;
+
+def.node_size_abc = 10;
+% node_size_abc : 三联图专用 marker 大小
+
+def.save_path = '';
+% save_path : 输出路径（空=不保存）
 end

@@ -418,13 +418,6 @@ end
 function p = fill_defaults(p)
 def = default_system_params();
 
-def.route_mode = 'mix';
-
-def.energy_trace = false;
-
-% 重传放队尾（更推荐，避免"卡死"）
-def.RETX_TO_TAIL = true;
-
 % merge
 fn = fieldnames(def);
 for k = 1:numel(fn)

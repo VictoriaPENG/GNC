@@ -170,41 +170,9 @@ function p = fill_defaults_local(p)
 def = default_system_params();
 
 % 拓扑参数（沿用你工程默认）
-def.topo_mode = 'uniform';
 def.show_links = false;
 
-% hotspot
-def.hotspot_enable = false;
-def.hotspot_ratio  = 0.25;
-def.hotspot_sigma  = min(def.Lx,def.Ly)*0.05;
-def.hotspot_center = def.fire_pos;
-
-% cluster
-def.Kc = 6;
-def.cluster_sigma = min(def.Lx,def.Ly)*0.06;
-def.cluster_center_mode = 'random';
-def.cluster_mix_uniform_ratio = 0.2;
-
-% road
-def.road_count = 2;
-def.road_width = min(def.Lx,def.Ly)*0.01;
-def.road_mix_uniform_ratio = 0.2;
-def.road_node_ratio = 0.8;
-
-% 颜色/视觉
-def.node_color = [0.2 0.2 0.2];
-def.fire_node_color = [0.85 0.2 0.2];
-def.bs_color = [0.1 0.4 0.9];
-def.road_color = [0.2 0.6 0.2];
-def.hotspot_color = [0.7 0.2 0.7];
-def.fire_circle_style = '--r';
 def.fire_circle_width = 1.3;
-
-% ✅ 关键：三联图专用 marker（不影响你别的图）
-def.node_size_abc = 10;
-
-% 输出
-def.save_path = '';
 
 fn = fieldnames(def);
 for k = 1:numel(fn)

@@ -22,6 +22,8 @@ Git: 8569fe892c99e336b0ad1e70e1f8f8ea087fcccb (branch main) dirty=1
 
 
 --- Summary ---
-  不包含字段的 <a href="matlab:helpPopup('struct')" style="font-weight:bold">struct</a>。
+     topo_modes: {'uniform'  'cluster'  'road'}
+    route_modes: {'tree'  'tree_energy'  'minhop'  'etx'  'greedy'  'energy'  'mindist'  'mix'}
+         n_runs: 20
 
 

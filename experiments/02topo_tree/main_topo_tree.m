@@ -543,42 +543,6 @@ end
 %% ==================== 默认参数填充 ====================
 function p = fill_defaults(p)
 def = default_system_params();
-def.route_mode = 'mix';
-
-% ==================== 汇聚树（Converge Tree）路由参数 ====================
-% route_mode 取值：
-%   - 'tree' / 'tree_etx' : 使用 ETX 代价构建汇聚树，转发固定走 parent(i)
-%   - 'tree_minhop'       : 使用 hop 代价构建汇聚树，转发固定走 parent(i)
-% 说明：
-%   - 如果 parent(i) 不可用（不连通/死亡），会自动回退到 etx 选路，保证不崩。
-def.tree_cost = 'etx';                 % 'etx' | 'hop'
-def.tree_rebuild_period = inf;         % 每隔多少步重建一次（inf=不重建）
-
-
-% ==================== 拓扑模式（2.1 补充） ====================
-% 支持：'uniform'（随机均匀）/ 'cluster'（分簇）/ 'road'（沿道路）
-def.topo_mode = 'uniform';
-
-% hotspot：支持“一个区域很多传感器”（可叠加到任意 topo_mode）
-def.hotspot_enable = false;
-def.hotspot_ratio  = 0.25;                   % 热点节点比例
-def.hotspot_sigma  = min(def.Lx,def.Ly)*0.05;% 热点扩散尺度（标准差）
-def.hotspot_center = def.fire_pos;           % 默认以火区为热点中心
-
-% cluster 参数
-def.Kc = 6;                                  % 簇数量
-def.cluster_sigma = min(def.Lx,def.Ly)*0.06; % 簇内扩散尺度
-def.cluster_center_mode = 'random';          % 'random' 或 'grid'
-def.cluster_mix_uniform_ratio = 0.2;         % 混入均匀节点比例
-
-% road 参数
-def.road_count = 2;                          % 自动生成道路数量（未提供 roads 时）
-def.road_width = min(def.Lx,def.Ly)*0.01;    % 道路横向扩散尺度（标准差）
-def.road_mix_uniform_ratio = 0.2;            % 混入均匀节点比例
-def.road_node_ratio = 0.8;                   % 非均匀部分中，沿道路采样比例
-
-% 重传放队尾（更推荐，避免"卡死"）
-def.RETX_TO_TAIL = true;
 
 % merge
 fn = fieldnames(def);
